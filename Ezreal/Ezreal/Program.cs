@@ -1,4 +1,4 @@
-﻿#region
+#region
 using System;
 using System.Collections.Generic;
 using Colors = System.Drawing.Color;
@@ -186,7 +186,7 @@ namespace Ezreal
             if (Config.Item("laneMana").GetValue<Slider>().Value >= (Player.Mana / Player.MaxMana) * 100) return;
 
             var useQ = Config.Item("UseQLane").GetValue<bool>();
-            var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.NotAlly);
+            var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
 
             if (minions.Count <= 0) return;
 
