@@ -61,7 +61,7 @@ namespace Ezreal
 
             Config.AddSubMenu(new Menu("Harass", "Harass"));
             Config.SubMenu("Harass").AddItem(new MenuItem("UseQHarass", "Use Q in Harass").SetValue(true));
-            Config.SubMenu("Harass").AddItem(new MenuItem("UseEHarass", "Use E in Harass").SetValue(false));
+            Config.SubMenu("Harass").AddItem(new MenuItem("UseWHarass", "Use W in Harass").SetValue(false));
             Config.SubMenu("Harass").AddItem(new MenuItem("harassMana", "Min. Mana Percent").SetValue(new Slider(50, 100, 0)));
 
             Config.AddSubMenu(new Menu("LaneClear", "LaneClear"));
@@ -152,8 +152,7 @@ namespace Ezreal
 
         private static void Harass()
         {
-            if (Config.Item("harassMana").GetValue<Slider>().Value >= (Player.Mana / Player.MaxMana) * 100) 
-                return;
+            if (Config.Item("harassMana").GetValue<Slider>().Value >= (Player.Mana / Player.MaxMana) * 100) return;
 
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
             if (target == null) return;
@@ -169,8 +168,7 @@ namespace Ezreal
 
         private static void JungleClear()
         {
-            if (Config.Item("jungleMana").GetValue<Slider>().Value >= (Player.Mana / Player.MaxMana) * 100)
-                return;
+            if (Config.Item("jungleMana").GetValue<Slider>().Value >= (Player.Mana / Player.MaxMana) * 100) return;
 
             var useQ = Config.Item("UseQJungle").GetValue<bool>();
             var mobs = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
@@ -185,8 +183,7 @@ namespace Ezreal
 
         private static void LaneClear()
         {
-            if (Config.Item("laneMana").GetValue<Slider>().Value >= (Player.Mana / Player.MaxMana) * 100)
-                return;
+            if (Config.Item("laneMana").GetValue<Slider>().Value >= (Player.Mana / Player.MaxMana) * 100) return;
 
             var useQ = Config.Item("UseQLane").GetValue<bool>();
             var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.NotAlly);
