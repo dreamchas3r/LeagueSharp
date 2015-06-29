@@ -132,15 +132,15 @@ namespace Ezreal
 
             switch (Config.Item("UseECombo").GetValue<StringList>().SelectedIndex)
             {
-                case 0:
-                    if (E.IsReady() && Player.Distance(target) <= Q.Range + E.Range)
-                        E.Cast(Game.CursorPos);
-                    break;
                 case 1:
-                    if (E.IsReady() && Player.Distance(target) <= Q.Range)
-                        E.Cast(target.ServerPosition);
-                    break;
+                    if (E.IsReady() && Q.IsReady() || W.IsReady() && Player.Distance(target) <= Q.Range + E.Range)
+                        E.Cast(Game.CursorPos);
+						break;
                 case 2:
+                    if (E.IsReady() && Q.IsReady() || W.IsReady() && Player.Distance(target) <= Q.Range + E.Range)
+                        E.Cast(target.ServerPosition);
+						break;
+                case 3:
                     return;
             }
 
