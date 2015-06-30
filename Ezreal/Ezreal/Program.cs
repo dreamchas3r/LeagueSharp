@@ -14,7 +14,7 @@ namespace Ezreal
     {
         public static string ChampionName = "Ezreal";
         public static Orbwalking.Orbwalker Orbwalker;
-		public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
+	public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public static List<Spell> SpellList = new List<Spell>();
         public static Spell Q;
         public static Spell W;
