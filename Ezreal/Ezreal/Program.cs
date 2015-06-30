@@ -63,7 +63,12 @@ namespace Ezreal
             Config.SubMenu("Harass").AddItem(new MenuItem("UseQHarass", "Use Q in Harass").SetValue(true));
             Config.SubMenu("Harass").AddItem(new MenuItem("UseWHarass", "Use W in Harass").SetValue(false));
             Config.SubMenu("Harass").AddItem(new MenuItem("harassMana", "Min. Mana Percent").SetValue(new Slider(50, 100, 0)));
-
+			
+			Config.AddSubMenu(new Menu("Farm", "Farm"));
+			Config.SubMenu("Farm").AddItem(new MenuItem("farmKey", "Farm Key").SetValue(new KeyBind(67, KeyBindType.Press)));
+            Config.SubMenu("Farm").AddItem(new MenuItem("UseQFarm", "Use Q in Farm").SetValue(true));
+			Config.SubMenu("Farm").AddItem(new MenuItem("farmMana", "Min. Mana Percent").SetValue(new Slider(50, 100, 0)));
+			
             Config.AddSubMenu(new Menu("LaneClear", "LaneClear"));
             Config.SubMenu("LaneClear").AddItem(new MenuItem("UseQLane", "Clear with Q").SetValue(true));
             Config.SubMenu("LaneClear").AddItem(new MenuItem("laneMana", "Min. Mana Percent").SetValue(new Slider(50, 100, 0)));
@@ -81,7 +86,10 @@ namespace Ezreal
             Config.SubMenu("Drawing").AddItem(new MenuItem("qDraw", "Draw Q Range").SetValue(true));
             Config.SubMenu("Drawing").AddItem(new MenuItem("wDraw", "Draw W Range").SetValue(true));
             Config.SubMenu("Drawing").AddItem(new MenuItem("eDraw", "Draw E Range").SetValue(true));
-
+			
+			Config.AddSubMenu(new Menu("Misc", "Misc"));
+			Config.SubMenu("Misc").AddItem(new MenuItem("HitChanceChooser", "Hitchance").SetValue(new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+			 
             Config.AddToMainMenu();
 
             Game.OnUpdate += Game_OnGameUpdate;
@@ -118,6 +126,9 @@ namespace Ezreal
                     JungleClear();
                     break;
             }
+			
+			if (Config.Item("farmKey").GetValue<KeyBind>().Active)
+                Farm();
 
             Killsteal();
         }
@@ -132,22 +143,22 @@ namespace Ezreal
 
             switch (Config.Item("UseECombo").GetValue<StringList>().SelectedIndex)
             {
-                case 1:
+                case 0:
                     if (E.IsReady() && Q.IsReady() || W.IsReady() && Player.Distance(target) <= Q.Range + E.Range)
                         E.Cast(Game.CursorPos);
-						break;
-                case 2:
+                    break;
+                case 1:
                     if (E.IsReady() && Q.IsReady() || W.IsReady() && Player.Distance(target) <= Q.Range + E.Range)
                         E.Cast(target.ServerPosition);
-						break;
-                case 3:
-                    return;
+                    break;
+                case 2:
+                    break;
             }
 
             if (useQ && Q.IsReady())
-                Q.CastIfHitchanceEquals(target, HitChance.High);
+                Q.CastIfHitchanceEquals(target, HitChanceChooser());
             if (useW && W.IsReady())
-                W.CastIfHitchanceEquals(target, HitChance.High);
+                W.CastIfHitchanceEquals(target, HitChanceChooser());
         }
 
         private static void Harass()
@@ -161,11 +172,26 @@ namespace Ezreal
             var useW = Config.Item("UseWHarass").GetValue<bool>();
 
             if (useQ && Q.IsReady())
-                Q.CastIfHitchanceEquals(target, HitChance.High);
+                Q.CastIfHitchanceEquals(target, HitChanceChooser());
             if (useW && W.IsReady())
-                W.CastIfHitchanceEquals(target, HitChance.High);
+                W.CastIfHitchanceEquals(target, HitChanceChooser());
         }
+		
+		private static void Farm()
+        {
+            if (Config.Item("farmMana").GetValue<Slider>().Value >= (Player.Mana / Player.MaxMana) * 100) return;
 
+            var useQ = Config.Item("UseQFarm").GetValue<bool>();
+            var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.NotAlly);
+
+            if (minions.Count <= 0) return;
+
+            var minion = minions[0];
+
+            if (useQ && Q.IsReady() && Q.GetDamage(minion) > minion.Health)
+                Q.CastIfHitchanceEquals(minion, HitChanceChooser());
+        }
+		
         private static void JungleClear()
         {
             if (Config.Item("jungleMana").GetValue<Slider>().Value >= (Player.Mana / Player.MaxMana) * 100) return;
@@ -178,7 +204,7 @@ namespace Ezreal
             var mob = mobs[0];
 
             if (useQ && Q.IsReady())
-                Q.CastIfHitchanceEquals(mob, HitChance.High);
+                Q.CastIfHitchanceEquals(mob, HitChanceChooser());
         }
 
         private static void LaneClear()
@@ -193,7 +219,7 @@ namespace Ezreal
             var minion = minions[0];
 
             if (useQ && Q.IsReady())
-                Q.CastIfHitchanceEquals(minion, HitChance.High);
+                Q.CastIfHitchanceEquals(minion, HitChanceChooser());
         }
 
         private static void Killsteal()
@@ -209,16 +235,33 @@ namespace Ezreal
             {
                 if (useQ && Q.IsReady() && Q.GetDamage(target) > target.Health
                     && Player.Distance(target) <= Q.Range)
-                    Q.CastIfHitchanceEquals(target, HitChance.High);
+                    Q.CastIfHitchanceEquals(target, HitChanceChooser());
 
                 if (useW && W.IsReady() && W.GetDamage(target) > target.Health
                     && Player.Distance(target) <= W.Range)
-                    W.CastIfHitchanceEquals(target, HitChance.High);
+                    W.CastIfHitchanceEquals(target, HitChanceChooser());
 
                 if (useR && R.IsReady() && R.GetDamage(target) > target.Health
                     && Player.Distance(target) <= R.Range && Player.Distance(target) >= Orbwalking.GetRealAutoAttackRange(Player))
                     R.Cast(target);
             }
         }
+		
+	private static HitChance HitChanceChooser()
+	{
+		switch (Config.Item("HitChanceChooser").GetValue<StringList>().SelectedIndex)
+            	{
+                case 0:
+                	 return HitChance.Low;
+                case 1:
+			return HitChance.Medium;
+                case 2:
+			return HitChance.High;
+                case 3:
+			return HitChance.VeryHigh;
+                default:
+			return HitChance.VeryHigh;
+            	}
+	}
     }
 }
