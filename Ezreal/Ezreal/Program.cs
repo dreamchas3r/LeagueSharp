@@ -14,7 +14,7 @@ namespace Ezreal
     {
         public static string ChampionName = "Ezreal";
         public static Orbwalking.Orbwalker Orbwalker;
-	public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
+		public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public static List<Spell> SpellList = new List<Spell>();
         public static Spell Q;
         public static Spell W;
@@ -64,10 +64,10 @@ namespace Ezreal
             Config.SubMenu("Harass").AddItem(new MenuItem("UseWHarass", "Use W in Harass").SetValue(false));
             Config.SubMenu("Harass").AddItem(new MenuItem("harassMana", "Min. Mana Percent").SetValue(new Slider(50, 100, 0)));
 			
-            Config.AddSubMenu(new Menu("Farm", "Farm"));
-            Config.SubMenu("Farm").AddItem(new MenuItem("farmKey", "Farm Key").SetValue(new KeyBind(67, KeyBindType.Press)));
+			Config.AddSubMenu(new Menu("Farm", "Farm"));
+			Config.SubMenu("Farm").AddItem(new MenuItem("farmKey", "Farm Key").SetValue(new KeyBind(67, KeyBindType.Press)));
             Config.SubMenu("Farm").AddItem(new MenuItem("UseQFarm", "Use Q in Farm").SetValue(true));
-            Config.SubMenu("Farm").AddItem(new MenuItem("farmMana", "Min. Mana Percent").SetValue(new Slider(50, 100, 0)));
+			Config.SubMenu("Farm").AddItem(new MenuItem("farmMana", "Min. Mana Percent").SetValue(new Slider(50, 100, 0)));
 			
             Config.AddSubMenu(new Menu("LaneClear", "LaneClear"));
             Config.SubMenu("LaneClear").AddItem(new MenuItem("UseQLane", "Clear with Q").SetValue(true));
@@ -87,8 +87,10 @@ namespace Ezreal
             Config.SubMenu("Drawing").AddItem(new MenuItem("wDraw", "Draw W Range").SetValue(true));
             Config.SubMenu("Drawing").AddItem(new MenuItem("eDraw", "Draw E Range").SetValue(true));
 			
-            Config.AddSubMenu(new Menu("Misc", "Misc"));
-            Config.SubMenu("Misc").AddItem(new MenuItem("HitChanceChooser", "Hitchance").SetValue(new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+			Config.AddSubMenu(new Menu("Misc", "Misc"));
+			Config.SubMenu("Misc").AddItem(new MenuItem("HitChanceChooser", "Hitchance").SetValue(new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+			Config.SubMenu("Misc").AddItem(new MenuItem("SkinChangerTogggle", "Use Skin Changer").SetValue(false));
+			Config.SubMenu("Misc").AddItem(new MenuItem("SkinChangerID", "Skins").SetValue(new StringList(new[] { "Classic", "Nottingham", "Striker", "Frosted", "Explorer", "Pulsefire", "TPA", "Debonair", "Ace of Spades" })));
 			 
             Config.AddToMainMenu();
 
@@ -113,6 +115,8 @@ namespace Ezreal
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
+            Player.SetSkin(Player.BaseSkinName, Config.Item("SkinChangerTogggle").GetValue<bool>() ? Config.Item("SkinChangerID").GetValue<StringList>().SelectedIndex : Player.BaseSkinId);
+			
             switch (Orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
@@ -127,8 +131,8 @@ namespace Ezreal
                     break;
             }
 			
-            if (Config.Item("farmKey").GetValue<KeyBind>().Active)
-            	Farm();
+			if (Config.Item("farmKey").GetValue<KeyBind>().Active)
+                Farm();
 
             Killsteal();
         }
@@ -146,11 +150,11 @@ namespace Ezreal
                 case 0:
                     if (E.IsReady() && Q.IsReady() || W.IsReady() && Player.Distance(target) <= Q.Range + E.Range)
                         E.Cast(Game.CursorPos);
-                    	break;
+                    break;
                 case 1:
                     if (E.IsReady() && Q.IsReady() || W.IsReady() && Player.Distance(target) <= Q.Range + E.Range)
                         E.Cast(target.ServerPosition);
-                    	break;
+                    break;
                 case 2:
                     break;
             }
@@ -247,21 +251,21 @@ namespace Ezreal
             }
         }
 		
-	private static HitChance HitChanceChooser()
-	{
-		switch (Config.Item("HitChanceChooser").GetValue<StringList>().SelectedIndex)
-            	{
-	                case 0:
-	                	 return HitChance.Low;
-	                case 1:
-				return HitChance.Medium;
-	                case 2:
-				return HitChance.High;
-	                case 3:
-				return HitChance.VeryHigh;
-			default:
-				return HitChance.VeryHigh;
-            	}
-	}
+		private static HitChance HitChanceChooser()
+		{
+			switch (Config.Item("HitChanceChooser").GetValue<StringList>().SelectedIndex)
+            {
+                case 0:
+                    return HitChance.Low;
+                case 1:
+                    return HitChance.Medium;
+                case 2:
+					return HitChance.High;
+                case 3:
+					return HitChance.VeryHigh;
+                default:
+                    return HitChance.VeryHigh;
+            }
+		}
     }
 }
