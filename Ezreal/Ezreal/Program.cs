@@ -251,16 +251,16 @@ namespace Ezreal
 	{
 		switch (Config.Item("HitChanceChooser").GetValue<StringList>().SelectedIndex)
             	{
-                case 0:
-                	 return HitChance.Low;
-                case 1:
-			return HitChance.Medium;
-                case 2:
-			return HitChance.High;
-                case 3:
-			return HitChance.VeryHigh;
-		default:
-			return HitChance.VeryHigh;
+	                case 0:
+	                	 return HitChance.Low;
+	                case 1:
+				return HitChance.Medium;
+	                case 2:
+				return HitChance.High;
+	                case 3:
+				return HitChance.VeryHigh;
+			default:
+				return HitChance.VeryHigh;
             	}
 	}
     }
