@@ -259,6 +259,8 @@ namespace Ezreal
 			return HitChance.High;
                 case 3:
 			return HitChance.VeryHigh;
+		default:
+			return HitChance.VeryHigh;
             	}
 	}
     }
